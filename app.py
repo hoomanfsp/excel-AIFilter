@@ -4,7 +4,7 @@ import threading
 import asyncio
 import os
 from excel_processor import ExcelProcessor
-from openrouter_api import OpenRouterFilter
+from openai_api import OpenAIFilter
 
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("blue")
@@ -30,7 +30,7 @@ class App(ctk.CTk):
         self.main_frame.grid_columnconfigure(0, weight=1)
         
         # Title
-        self.title_label = ctk.CTkLabel(self.main_frame, text="OpenRouter Excel Filterer", font=ctk.CTkFont(size=24, weight="bold"))
+        self.title_label = ctk.CTkLabel(self.main_frame, text="OpenAI Excel Filterer", font=ctk.CTkFont(size=24, weight="bold"))
         self.title_label.grid(row=0, column=0, padx=20, pady=(20, 10))
         
         # API Key
@@ -38,10 +38,10 @@ class App(ctk.CTk):
         self.api_frame.grid(row=1, column=0, padx=20, pady=10, sticky="ew")
         self.api_frame.grid_columnconfigure(1, weight=1)
         
-        self.api_label = ctk.CTkLabel(self.api_frame, text="OpenRouter API Key:")
+        self.api_label = ctk.CTkLabel(self.api_frame, text="OpenAI API Key:")
         self.api_label.grid(row=0, column=0, padx=(0, 10))
         
-        self.api_entry = ctk.CTkEntry(self.api_frame, show="*", placeholder_text="Enter your OpenRouter API Key")
+        self.api_entry = ctk.CTkEntry(self.api_frame, show="*", placeholder_text="Enter your OpenAI API Key")
         self.api_entry.grid(row=0, column=1, sticky="ew")
         
         # Topic
@@ -115,7 +115,7 @@ class App(ctk.CTk):
         topic = self.topic_entry.get().strip()
         
         if not api_key:
-            messagebox.showwarning("Input Error", "Please enter your OpenRouter API Key.")
+            messagebox.showwarning("Input Error", "Please enter your OpenAI API Key.")
             return
         if not self.selected_file:
             messagebox.showwarning("Input Error", "Please select an Excel file.")
@@ -154,15 +154,15 @@ class App(ctk.CTk):
         # Schedule update on main thread
         progress_val = current / total if total > 0 else 0
         self.after(0, lambda: self.progress_bar.set(progress_val))
-        self.after(0, lambda: self.status_label.configure(text=f"Processed {current} / {total} rows... (Rate limiting to 15 Req/Min)"))
+        self.after(0, lambda: self.status_label.configure(text=f"Processed {current} / {total} rows..."))
 
     def run_filtering(self, api_key, topic, selected_cols, save_path):
         try:
             # 1. Extract context items from Excel
             items = self.excel_processor.extract_context_items(selected_cols)
             
-            # 2. Setup OpenRouter
-            api_client = OpenRouterFilter(api_key=api_key)
+            # 2. Setup OpenAI
+            api_client = OpenAIFilter(api_key=api_key)
             
             # 3. Process batches via asyncio
             results = asyncio.run(api_client.filter_all_async(
