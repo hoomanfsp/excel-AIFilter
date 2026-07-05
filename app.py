@@ -35,51 +35,75 @@ class App(ctk.CTk):
         
         # API Key
         self.api_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        self.api_frame.grid(row=1, column=0, padx=20, pady=10, sticky="ew")
+        self.api_frame.grid(row=1, column=0, padx=20, pady=5, sticky="ew")
         self.api_frame.grid_columnconfigure(1, weight=1)
         
-        self.api_label = ctk.CTkLabel(self.api_frame, text="OpenAI API Key:")
-        self.api_label.grid(row=0, column=0, padx=(0, 10))
+        self.api_label = ctk.CTkLabel(self.api_frame, text="OpenAI API Key:", font=ctk.CTkFont(weight="bold"))
+        self.api_label.grid(row=0, column=0, padx=(0, 10), sticky="w")
         
-        self.api_entry = ctk.CTkEntry(self.api_frame, show="*", placeholder_text="Enter your OpenAI API Key")
+        self.api_entry = ctk.CTkEntry(self.api_frame, show="*", placeholder_text="sk-proj-...")
         self.api_entry.grid(row=0, column=1, sticky="ew")
         
+        self.api_desc = ctk.CTkLabel(self.main_frame, text="Your API key is never stored and only used directly to contact OpenAI.", font=ctk.CTkFont(size=11), text_color="gray")
+        self.api_desc.grid(row=2, column=0, padx=20, pady=(0, 15), sticky="w")
+        
+        # Model Selection
+        self.model_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
+        self.model_frame.grid(row=3, column=0, padx=20, pady=5, sticky="ew")
+        self.model_frame.grid_columnconfigure(1, weight=1)
+        
+        self.model_label = ctk.CTkLabel(self.model_frame, text="Select Model:", font=ctk.CTkFont(weight="bold"))
+        self.model_label.grid(row=0, column=0, padx=(0, 10), sticky="w")
+        
+        self.model_var = ctk.StringVar(value="gpt-4o-mini")
+        self.model_dropdown = ctk.CTkComboBox(self.model_frame, variable=self.model_var, values=["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"])
+        self.model_dropdown.grid(row=0, column=1, sticky="ew")
+        
+        self.model_desc = ctk.CTkLabel(self.main_frame, text="gpt-4o-mini is recommended for the fastest and cheapest filtering.", font=ctk.CTkFont(size=11), text_color="gray")
+        self.model_desc.grid(row=4, column=0, padx=20, pady=(0, 15), sticky="w")
+
         # Topic
         self.topic_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        self.topic_frame.grid(row=2, column=0, padx=20, pady=10, sticky="ew")
+        self.topic_frame.grid(row=5, column=0, padx=20, pady=5, sticky="ew")
         self.topic_frame.grid_columnconfigure(1, weight=1)
         
-        self.topic_label = ctk.CTkLabel(self.topic_frame, text="Topic to match:")
-        self.topic_label.grid(row=0, column=0, padx=(0, 10))
+        self.topic_label = ctk.CTkLabel(self.topic_frame, text="Topic to match:", font=ctk.CTkFont(weight="bold"))
+        self.topic_label.grid(row=0, column=0, padx=(0, 10), sticky="w")
         
         self.topic_entry = ctk.CTkEntry(self.topic_frame, placeholder_text="e.g., Computer Science")
         self.topic_entry.grid(row=0, column=1, sticky="ew")
         
+        self.topic_desc = ctk.CTkLabel(self.main_frame, text="Define what you want to filter for. Rows matching this concept will be kept.", font=ctk.CTkFont(size=11), text_color="gray")
+        self.topic_desc.grid(row=6, column=0, padx=20, pady=(0, 15), sticky="w")
+        
         # File Selection
-        self.file_btn = ctk.CTkButton(self.main_frame, text="Select Excel File", command=self.select_file)
-        self.file_btn.grid(row=3, column=0, padx=20, pady=(20, 5))
+        self.file_btn = ctk.CTkButton(self.main_frame, text="Select Excel File", command=self.select_file, fg_color="#0056b3", hover_color="#004494")
+        self.file_btn.grid(row=7, column=0, padx=20, pady=(20, 5))
         
         self.file_label = ctk.CTkLabel(self.main_frame, text="No file selected", text_color="gray")
-        self.file_label.grid(row=4, column=0, padx=20, pady=(0, 10))
+        self.file_label.grid(row=8, column=0, padx=20, pady=(0, 10))
         
         # Column Selection Frame
         self.col_label = ctk.CTkLabel(self.main_frame, text="Select Columns to send as Context:", font=ctk.CTkFont(weight="bold"))
-        self.col_label.grid(row=5, column=0, padx=20, pady=(10, 5), sticky="w")
+        self.col_label.grid(row=9, column=0, padx=20, pady=(10, 0), sticky="w")
         
-        self.scrollable_frame = ctk.CTkScrollableFrame(self.main_frame, height=150)
-        self.scrollable_frame.grid(row=6, column=0, padx=20, pady=(0, 20), sticky="nsew")
-        self.main_frame.grid_rowconfigure(6, weight=1)
+        self.col_desc = ctk.CTkLabel(self.main_frame, text="The selected columns will be merged and sent to the AI for evaluation.", font=ctk.CTkFont(size=11), text_color="gray")
+        self.col_desc.grid(row=10, column=0, padx=20, pady=(0, 5), sticky="w")
+        
+        self.scrollable_frame = ctk.CTkScrollableFrame(self.main_frame, height=130)
+        self.scrollable_frame.grid(row=11, column=0, padx=20, pady=(0, 20), sticky="nsew")
+        self.main_frame.grid_rowconfigure(11, weight=1)
         
         # Action Button & Progress
-        self.start_btn = ctk.CTkButton(self.main_frame, text="Start Filtering", command=self.start_filtering_thread, fg_color="#28a745", hover_color="#218838")
-        self.start_btn.grid(row=7, column=0, padx=20, pady=10)
+        self.start_btn = ctk.CTkButton(self.main_frame, text="Start Filtering", command=self.start_filtering_thread, fg_color="#28a745", hover_color="#218838", height=40, font=ctk.CTkFont(weight="bold"))
+        self.start_btn.grid(row=12, column=0, padx=20, pady=10)
         
         self.progress_bar = ctk.CTkProgressBar(self.main_frame)
-        self.progress_bar.grid(row=8, column=0, padx=20, pady=10, sticky="ew")
+        self.progress_bar.grid(row=13, column=0, padx=20, pady=10, sticky="ew")
         self.progress_bar.set(0)
         
         self.status_label = ctk.CTkLabel(self.main_frame, text="Ready")
-        self.status_label.grid(row=9, column=0, padx=20, pady=(0, 20))
+        self.status_label.grid(row=14, column=0, padx=20, pady=(0, 20))
 
     def select_file(self):
         filepath = filedialog.askopenfilename(
@@ -147,8 +171,10 @@ class App(ctk.CTk):
             self.reset_ui()
             return
             
+        model_val = self.model_var.get()
+        
         # Start background thread
-        threading.Thread(target=self.run_filtering, args=(api_key, topic, selected_cols, save_path), daemon=True).start()
+        threading.Thread(target=self.run_filtering, args=(api_key, topic, selected_cols, save_path, model_val), daemon=True).start()
 
     def update_progress(self, current, total):
         # Schedule update on main thread
@@ -156,7 +182,7 @@ class App(ctk.CTk):
         self.after(0, lambda: self.progress_bar.set(progress_val))
         self.after(0, lambda: self.status_label.configure(text=f"Processed {current} / {total} rows..."))
 
-    def run_filtering(self, api_key, topic, selected_cols, save_path):
+    def run_filtering(self, api_key, topic, selected_cols, save_path, model_name):
         try:
             # 1. Extract context items from Excel
             items = self.excel_processor.extract_context_items(selected_cols)
@@ -169,7 +195,8 @@ class App(ctk.CTk):
                 all_items=items, 
                 topic=topic, 
                 batch_size=25, 
-                progress_callback=self.update_progress
+                progress_callback=self.update_progress,
+                model_name=model_name
             ))
             
             # 4. Save results

@@ -1,0 +1,8 @@
+__pycache__/
+build/
+dist/
+*.spec
+*.pyc
+.env
+test_data.xlsx
+filtered_output.xlsx

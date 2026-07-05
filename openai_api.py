@@ -22,14 +22,14 @@ class OpenAIFilter:
         return prompt
 
     @retry(wait=wait_exponential(multiplier=2, min=2, max=60), stop=stop_after_attempt(5))
-    def filter_batch(self, items: list[str], topic: str) -> list[int]:
+    def filter_batch(self, items: list[str], topic: str, model_name: str = "gpt-4o-mini") -> list[int]:
         if not items:
             return []
             
         prompt = self._create_prompt(items, topic)
         
         response = self.client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=model_name,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.0
         )
@@ -67,7 +67,7 @@ class OpenAIFilter:
             print(f"Error parsing response: {e}. Raw content: {response.choices[0].message.content}")
             raise  # trigger retry
 
-    async def filter_all_async(self, all_items: list[str], topic: str, batch_size: int, progress_callback=None) -> list[int]:
+    async def filter_all_async(self, all_items: list[str], topic: str, batch_size: int, progress_callback=None, model_name: str = "gpt-4o-mini") -> list[int]:
         results = []
         total_items = len(all_items)
         
@@ -76,7 +76,7 @@ class OpenAIFilter:
             
             batch = all_items[i:i+batch_size]
             
-            batch_result = await asyncio.to_thread(self.filter_batch, batch, topic)
+            batch_result = await asyncio.to_thread(self.filter_batch, batch, topic, model_name)
             results.extend(batch_result)
             
             if progress_callback:
